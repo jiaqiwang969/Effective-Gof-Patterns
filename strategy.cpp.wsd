@@ -5,6 +5,8 @@ set namespaceSeparator ::
 class classic::beverages::CoffeeMachine {
 + void request(class classic::beverages::Command *c)
 + void start()
++ void setState(CoffeeMachineState *newState)
++ void execute(string const &cmd)
 }
 
 interface classic::beverages::Command {
@@ -60,6 +62,38 @@ class classic::beverages::TeaReceipe {
 + void addCondiments()
 }
 
+class classic::beverages::CoffeeMachineState{
++ virtual void action(CoffeeMachine &coffeeMachine, string const &cmd)  
+}
+
+class classic::beverages::CoffeeMachineObserver{
++ virtual void finished() = 0
+}
+
+class classic::beverages::View
+{
++ virtual void finished()
+}
+
+class classic::beverages::ObservableCoffeeMachine
+{
++ void addObserver(Observers::value_type o)
++ void removeObserver(Observers::value_type o)
+# void notifyFinished()
+}
+
+namespace classic {
+namespace beverages {
+note right of ObservableCoffeeMachine::notifyFinished
+                for (Observers::iterator it(m_observers.begin()); 
+                it != m_observers.end(); ++it)
+                {
+                    (*it)->finished();
+                }
+end note
+}
+}
+
 
 
 
@@ -81,5 +115,13 @@ classic::beverages::Caffeinebeverages *-down-> classic::beverages::Receipe
 classic::beverages::MakeCaffeineDrink *--> classic::beverages::Caffeinebeverages
 
 classic::beverages::MilkFoam <-up-* classic::beverages::MakeMilkFoam
+
+
+classic::beverages::CoffeeMachine -up-|> classic::beverages::ObservableCoffeeMachine
+classic::beverages::ObservableCoffeeMachine *-right-> classic::beverages::CoffeeMachineObserver
+classic::beverages::View -up-|> classic::beverages::CoffeeMachineObserver 
+classic::beverages::CoffeeMachine *--> classic::beverages::CoffeeMachineState
+
+classic::beverages::View "&view".left.> classic::beverages::CoffeeMachine
 
 @enduml

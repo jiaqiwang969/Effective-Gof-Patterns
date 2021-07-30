@@ -115,7 +115,7 @@ namespace cpp11
 
         public:
             CoffeeMachine()
-                : m_commands()
+                : m_commands(), m_sigFinished()
             {
             }
 
@@ -130,12 +130,35 @@ namespace cpp11
                     begin(m_commands), end(m_commands),
                     [](CommandQ::value_type c)
                     { c(); });
+                m_sigFinished();
+            }
+
+            void getNotifiedOnFinished(function<void()> callback)
+            {
+                m_sigFinished.connect(callback);
             }
 
         private:
             CommandQ m_commands;
+            boost::signals2::signal<void()> m_sigFinished;
 
             NO_COPY_NO_MOVE(CoffeeMachine);
+        };
+
+        class View
+        {
+        public:
+            View()
+            {
+            }
+
+            void coffeeMachineFinished()
+            {
+                cout << "Orders are ready to be served\n";
+            }
+
+        private:
+            NO_COPY_NO_MOVE(View);
         };
 
         class MilkFoam
@@ -234,11 +257,10 @@ int main(int argc, char *argv[])
             beverages.push_back(&coffee);
             beverages.push_back(&tea);
 
-            using namespace placeholders;
-
             // for_each(
             //     begin(beverages), end(beverages),
-            //     bind(&CaffeineBeverage::prepareReceipe, _1));
+            //     bind(&CaffeineBeverage::prepareReceipe, placeholders::_1));
+
             for (auto beverage : beverages)
             {
                 beverage->prepareReceipe();
@@ -255,6 +277,11 @@ int main(int argc, char *argv[])
             // Adding Lemon
 
             CoffeeMachine coffeeMachine;
+
+            View view;
+            // coffeeMachine.getNotifiedOnFinished(bind(&View::coffeeMachineFinished, &view));
+            coffeeMachine.getNotifiedOnFinished([&]
+                                                { view.coffeeMachineFinished(); });
 
             coffeeMachine.request(bind(&CaffeineBeverage::prepareReceipe, &coffee));
             coffeeMachine.request(bind(&CaffeineBeverage::prepareReceipe, &tea));
@@ -275,6 +302,7 @@ int main(int argc, char *argv[])
             // boiling 100ml milk
             // pour in cup
             // foaming
+            //Orders are ready to be served
 
             coffeeMachine.request(bind(&MilkFoam::makeFoam, &milkFoam, 200));
             coffeeMachine.request(bind(&MilkFoam::makeFoam, &milkFoam, 300));
@@ -297,6 +325,7 @@ int main(int argc, char *argv[])
             // boiling 300ml milk
             // pour in cup
             // foaming
+            //Orders are ready to be served
 
             Condiment condiments;
             // condiments.description = bind(&accu<string>, &Milk::description, condiments.description);

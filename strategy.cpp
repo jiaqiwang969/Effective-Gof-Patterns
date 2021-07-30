@@ -214,15 +214,94 @@ namespace classic
             virtual void execute() = 0;
         };
 
-        class CoffeeMachine
+        class CoffeeMachine;
+
+        class CoffeeMachineState
+        {
+        public:
+            virtual void action(CoffeeMachine &coffeeMachine, string const &cmd) = 0;
+        };
+
+        class CoffeeMachineObserver
+        {
+        public:
+            virtual void finished() = 0;
+        };
+
+        class View : public CoffeeMachineObserver
+        {
+        public:
+            View()
+                : CoffeeMachineObserver()
+            {
+            }
+
+            virtual void finished()
+            {
+                cout << "Orders are ready to be served\n";
+            }
+
+        private:
+            NO_COPY(View);
+        };
+
+        class ObservableCoffeeMachine
+        {
+        private:
+            typedef vector<CoffeeMachineObserver *> Observers;
+
+        public:
+            ObservableCoffeeMachine()
+                : m_observers()
+            {
+            }
+
+            void addObserver(Observers::value_type o)
+            {
+                m_observers.push_back(o);
+            }
+
+            void removeObserver(Observers::value_type o)
+            {
+                Observers::iterator it = find(m_observers.begin(), m_observers.end(), o);
+                if (it != m_observers.end())
+                    m_observers.erase(it);
+            }
+
+        protected:
+            void notifyFinished()
+            {
+                for (Observers::iterator it(m_observers.begin()); it != m_observers.end(); ++it)
+                {
+                    (*it)->finished();
+                }
+            }
+
+        private:
+            Observers m_observers;
+
+            NO_COPY(ObservableCoffeeMachine);
+        };
+
+        class CoffeeMachine : public ObservableCoffeeMachine
         {
         private:
             typedef vector<Command *> CommandQ;
 
         public:
             CoffeeMachine()
-                : m_commands()
+                : ObservableCoffeeMachine(), m_commands(), m_state(0)
             {
+            }
+
+            void setState(CoffeeMachineState *newState)
+            {
+                m_state = newState;
+            }
+
+            void execute(string const &cmd)
+            {
+                m_state->action(*this, cmd);
             }
 
             void request(Command *c)
@@ -236,10 +315,12 @@ namespace classic
                 {
                     (*it)->execute();
                 }
+                this->notifyFinished();
             }
 
         private:
             CommandQ m_commands;
+            CoffeeMachineState *m_state;
 
             NO_COPY(CoffeeMachine);
         };
@@ -380,6 +461,9 @@ int main(int argc, char *argv[])
 
             // 清单到位，需要一个咖啡机
             CoffeeMachine coffeeMachine;
+            View view;
+
+            coffeeMachine.addObserver(&view);
 
             // 咖啡机写入清淡
             coffeeMachine.request(&makeCoffee);

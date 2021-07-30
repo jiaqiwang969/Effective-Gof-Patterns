@@ -8,6 +8,8 @@ class cpp11::beverages::CaffeineBeverage {
 class cpp11::beverages::CoffeeMachine {
 + void request(vector<function<void()>> ::value_type c)
 + void start()
++ void getNotifiedOnFinished(function<void()> callback)
+- boost::signals2::signal<void()> m_sigFinished;
 }
 
 class cpp11::beverages::Condiment {
@@ -42,17 +44,25 @@ interface cpp11::beverages::Receipes {
 + void addLemon()
 }
 
+
+class cpp11::beverages::View
+{
++ void coffeeMachineFinished()
+}
+
 cpp11::beverages::CaffeineBeverage *-right-> cpp11::beverages::Receipe
 
-cpp11::beverages::CoffeeMachine ..> cpp11::beverages::CaffeineBeverage
+cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::CaffeineBeverage
 
-cpp11::beverages::CaffeineBeverage ..> cpp11::beverages::Receipes
+cpp11::beverages::CaffeineBeverage "bind"..> cpp11::beverages::Receipes
 
 
-cpp11::beverages::CoffeeMachine ..> cpp11::beverages::MilkFoam
+cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::MilkFoam
 
-cpp11::beverages::Condiment ..>  cpp11::beverages::Milk
-cpp11::beverages::Condiment ..>  cpp11::beverages::Sugar
+cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::View
+
+cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Milk
+cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Sugar
 
 
 @enduml
