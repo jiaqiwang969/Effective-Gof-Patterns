@@ -1,0 +1,85 @@
+@startuml
+set namespaceSeparator ::
+
+
+class classic::beverages::CoffeeMachine {
++ void request(class classic::beverages::Command *c)
++ void start()
+}
+
+interface classic::beverages::Command {
++ void execute()
+}
+
+class classic::beverages::MakeMilkFoam {
++ void execute()
++ void setMlMilk(int mlMilk)
+}
+
+
+class classic::beverages::MilkFoam {
++ void makeFoam(int mlMilk)
+}
+
+
+class classic::beverages::MakeCaffeineDrink {
++ void execute()
+}
+
+
+class classic::beverages::Caffeinebeverages {
++ void prepareReceipe()
+}
+
+
+interface classic::beverages::Receipe {
++ void brew()
++ void addCondiments()
+}
+
+
+
+class classic::beverages::Condiment {
++ int description()
++ float price()
+}
+
+class classic::beverages::Milk {
+}
+
+class classic::beverages::Sugar {
+}
+
+class classic::beverages::CoffeeReceipe {
++ void brew()
++ void addCondiments()
+}
+
+class classic::beverages::TeaReceipe {
++ void brew()
++ void addCondiments()
+}
+
+
+
+
+
+classic::beverages::CoffeeReceipe -up-|> classic::beverages::Receipe
+classic::beverages::MakeCaffeineDrink -up-|> classic::beverages::Command
+classic::beverages::MakeMilkFoam -up-|> classic::beverages::Command
+classic::beverages::Milk -up-|> classic::beverages::Condiment
+classic::beverages::Sugar -up-|> classic::beverages::Condiment
+classic::beverages::TeaReceipe -up-|> classic::beverages::Receipe
+
+
+
+classic::beverages::Command <-up-* classic::beverages::CoffeeMachine   
+
+
+classic::beverages::Caffeinebeverages *-down-> classic::beverages::Receipe
+
+classic::beverages::MakeCaffeineDrink *--> classic::beverages::Caffeinebeverages
+
+classic::beverages::MilkFoam <-up-* classic::beverages::MakeMilkFoam
+
+@enduml

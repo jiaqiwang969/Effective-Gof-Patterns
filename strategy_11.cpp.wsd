@@ -1,0 +1,58 @@
+@startuml
+set namespaceSeparator ::
+
+class cpp11::beverages::CaffeineBeverage {
++ void prepareReceipe()
+}
+
+class cpp11::beverages::CoffeeMachine {
++ void request(vector<function<void()>> ::value_type c)
++ void start()
+}
+
+class cpp11::beverages::Condiment {
++ function<string()> description
++ function<float()> price
+}
+
+class cpp11::beverages::Milk {
++ static string description()
++ static float price()
+}
+
+class cpp11::beverages::Sugar {
++ static string description()
++ static float price()
+}
+
+
+class cpp11::beverages::MilkFoam {
++ void makeFoam(int mlMilk)
+}
+
+class cpp11::beverages::Receipe {
++ function<void()> brew;
++ function<void()> addCondiments;
+}
+
+interface cpp11::beverages::Receipes {
++ void brewCoffee(int minutes)
++ void brewTea(int minutes)
++ void addSugarAndMilk()
++ void addLemon()
+}
+
+cpp11::beverages::CaffeineBeverage *-right-> cpp11::beverages::Receipe
+
+cpp11::beverages::CoffeeMachine ..> cpp11::beverages::CaffeineBeverage
+
+cpp11::beverages::CaffeineBeverage ..> cpp11::beverages::Receipes
+
+
+cpp11::beverages::CoffeeMachine ..> cpp11::beverages::MilkFoam
+
+cpp11::beverages::Condiment ..>  cpp11::beverages::Milk
+cpp11::beverages::Condiment ..>  cpp11::beverages::Sugar
+
+
+@enduml

@@ -1,9 +1,11 @@
+//Original UML ---> https : //cdn.mathpix.com/snip/images/RB2SQ9jYlXyQAKT8eWtOSsPHqL_pKrZiR4sQPlYa4KY.original.fullsize.png
 
 // g++ -std=c++98 -o strategy strategy.cpp
 #include <iostream>
 #include <functional>
 #include <vector>
 #include <algorithm>
+#include <string>
 
 #define NO_COPY(className)        \
 private:                          \
@@ -28,7 +30,7 @@ using namespace std;
 namespace classic
 {
 
-    namespace beverage // 饮料
+    namespace beverages // 饮料
     {
 
         class Receipe // 收据
@@ -132,32 +134,24 @@ namespace classic
             {
             }
 
-            void add()
+            string description()
             {
                 if (m_next)
-                    m_next->add();
-                this->onAdd();
+                    return this->onDescription() + m_next->description();
+                return this->onDescription();
+            }
+            float price()
+            {
+                if (m_next)
+                    return this->onPrice() + m_next->price();
+                return this->onPrice();
             }
 
         private:
-            virtual void onAdd() = 0;
+            virtual string onDescription() = 0;
+            virtual float onPrice() = 0;
 
             Condiment *m_next;
-        };
-
-        //
-        class ReceipeWithCondiments : public Receipe
-        {
-        public:
-            virtual void addCondiments()
-            {
-                m_condiment->add();
-            }
-
-        private:
-            Condiment *m_condiment;
-
-            NO_COPY(ReceipeWithCondiments);
         };
 
         class Milk : public Condiment
@@ -174,9 +168,14 @@ namespace classic
             }
 
         private:
-            virtual void onAdd()
+            virtual string onDescription()
             {
-                cout << "-Milk-";
+                return "-Milk-";
+            }
+
+            virtual float onPrice()
+            {
+                return 0.13f;
             }
 
             NO_COPY(Milk);
@@ -196,9 +195,14 @@ namespace classic
             }
 
         private:
-            virtual void onAdd()
+            virtual string onDescription()
             {
-                cout << "-Sugar-";
+                return "-Sugar-";
+            }
+
+            virtual float onPrice()
+            {
+                return 0.07f;
             }
 
             NO_COPY(Sugar);
@@ -320,153 +324,12 @@ namespace classic
 
 }
 
-// namespace cpp11
-// {
-
-//     namespace beverages
-//     {
-
-//         struct Receipe
-//         {
-//         public:
-//             function<void()> brew;
-//             function<void()> addCondiments;
-//         };
-
-//         class CaffeineBeverage
-//         {
-//         public:
-//             CaffeineBeverage(Receipe receipe)
-//             : m_brew(receipe.brew)
-//             , m_addCondiments(receipe.addCondiments)
-//             {}
-
-//             CaffeineBeverage(function<void()> brew, function<void()> addCondiments)
-//             : m_brew(brew)
-//             , m_addCondiments(addCondiments)
-//             {}
-
-//             void prepareReceipe()
-//             {
-//                 boilWater();
-//                 m_brew();
-//                 pourInCup();
-//                 m_addCondiments();
-//             }
-
-//         private:
-//             void boilWater()
-//             {
-//                 cout << "boil water\n";
-//             }
-
-//             void pourInCup()
-//             {
-//                 cout << "pour in cup\n";
-//             }
-
-//             function<void()> m_brew;
-//             function<void()> m_addCondiments;
-
-//             NO_COPY_NO_MOVE(CaffeineBeverage);
-//         };
-
-//         class Receipes
-//         {
-//         public:
-//             static void brewCoffee(int minutes)
-//             {
-//                 cout << minutes << "min for dripping Coffee through filter\n";
-//             }
-
-//             static void brewTea(int minutes)
-//             {
-//                 cout << minutes << "min for steeping Tea\n";
-//             }
-
-//             static void addSugarAndMilk()
-//             {
-//                 cout << "Adding Sugar and Milk\n";
-//             }
-
-//             static void addLemon()
-//             {
-//                 cout << "Adding Lemon\n";
-//             }
-
-//             NO_COPY_NO_MOVE(Receipes);
-//         };
-
-//         class CoffeeMachine
-//         {
-//         private:
-//             typedef vector<function<void()>> CommandQ;
-
-//         public:
-//             CoffeeMachine()
-//             : m_commands()
-//             {}
-
-//             void request(CommandQ::value_type c)
-//             {
-//                 m_commands.push_back(c);
-//             }
-
-//             void start()
-//             {
-//                 for_each(
-//                     begin(m_commands), end(m_commands),
-//                     [](CommandQ::value_type c){ c(); });
-//             }
-
-//         private:
-//             CommandQ m_commands;
-
-//             NO_COPY_NO_MOVE(CoffeeMachine);
-//         };
-
-//         class MilkFoam
-//         {
-//         public:
-//             MilkFoam()
-//             {}
-
-//             void makeFoam(int mlMilk)
-//             {
-//                 boilMilk(mlMilk);
-//                 pourInCup();
-//                 foaming();
-//             }
-
-//         private:
-//             void boilMilk(int mlMilk)
-//             {
-//                 cout << "boiling " << mlMilk << "ml milk\n";
-//             }
-
-//             void pourInCup()
-//             {
-//                 cout << "pour in cup\n";
-//             }
-
-//             void foaming()
-//             {
-//                 cout << "foaming\n";
-//             }
-
-//             NO_COPY_NO_MOVE(MilkFoam);
-//         };
-
-//     }
-
-// }
-
 int main(int argc, char *argv[])
 {
     {
         using namespace classic;
         {
-            using namespace beverage;
+            using namespace beverages;
             // 你好👋，我要来一份手冲摩卡咖啡☕️。
             // 好的，开始手冲摩卡咖啡的制作流程。
 
@@ -560,6 +423,14 @@ int main(int argc, char *argv[])
             // boiling 300ml milk
             // pour in cup
             // foaming
+
+            // 独立的一个chain类
+            Milk milk;
+            Sugar sugarMilk(&milk);
+            Sugar doubleSugarMilk(&sugarMilk);
+
+            cout << "Condiments: " << doubleSugarMilk.description() << '\n';
+            cout << "Price: " << doubleSugarMilk.price() << '\n';
         }
     }
 
