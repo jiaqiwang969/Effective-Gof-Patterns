@@ -31,6 +31,9 @@ class classic::MakeCaffeineDrink {
 
 class classic::CaffeineBeverage {
 + void prepareRecipe()
++ void condiments(Condiment *condiments)
+- Recipe &m_recipe;
+- Condiment *m_condiments;
 }
 
 
@@ -116,8 +119,33 @@ class classic::TeaFactory
 
 class classic::BeverageFactory
 {
-
++ CaffeineBeverage *create(std::string const &beverage)
+- CaffeineBeverageFactory *> m_factory
 }
+
+
+class classic::CaffeineCondimentFactory
+{
++ virtual Condiment *create(Condiment *) = 0
+}
+
+class classic::CondimentFactory
+{
++ Condiment *create(std::string const &beverage, Condiment *condiment)
+- std::map<std::string, CaffeineCondimentFactory *> m_factory
+}
+
+class classic::MilkFactory
+{
++ virtual Condiment *create(Condiment *condiment)
+}
+
+class classic::SugarFactory
+{
++ virtual Condiment *create(Condiment *condiment)
+}
+
+
 
 
 classic::CoffeeRecipe -up-|> classic::Recipe
@@ -158,7 +186,7 @@ classic::CoffeeFactory .right.> classic::Coffee
 
 classic::TeaFactory .right.> classic::Tea
 
-classic::CaffeineBeverageFactory .right.> classic::CaffeineBeverage
+classic::CaffeineBeverageFactory "工厂".right.> classic::CaffeineBeverage
 
 
 classic::BeverageFactory *-right-> classic::CaffeineBeverageFactory
@@ -166,6 +194,28 @@ classic::BeverageFactory *-right-> classic::CaffeineBeverageFactory
 classic::BeverageFactory .right.> classic::CoffeeFactory
 
 classic::BeverageFactory .right.> classic::TeaFactory
+
+
+classic::MilkFactory -up-|> classic::CaffeineCondimentFactory
+
+classic::SugarFactory -up-|> classic::CaffeineCondimentFactory
+
+classic::MilkFactory .right.> classic::Milk
+
+classic::SugarFactory .right.> classic::Sugar
+
+classic::CaffeineCondimentFactory "工厂".right.> classic::Condiment
+
+
+classic::CondimentFactory ..> classic::SugarFactory
+
+classic::CondimentFactory ..> classic::MilkFactory
+
+classic::CondimentFactory *-right-> classic::CaffeineCondimentFactory
+
+
+
+classic::CaffeineBeverage *-right-> classic::Condiment
 
 
 ' --------分割线--------

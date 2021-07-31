@@ -3,6 +3,7 @@
 #define CaffeineBeverageFactory_h
 
 #include "../utils/NoCopy.h"
+#include "CaffeineBeverage.h"
 
 namespace classic
 {

@@ -15,6 +15,10 @@ namespace classic
         {
         }
 
+        virtual ~MakeCaffeineDrink()
+        {
+        }
+
         virtual void execute()
         {
             m_drink.prepareRecipe();

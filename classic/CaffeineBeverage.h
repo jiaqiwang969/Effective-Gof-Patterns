@@ -3,27 +3,37 @@
 
 #include "../utils/NoCopy.h"
 #include <iostream>
+#include "Recipe.h"
+#include "Condiment.h"
 
 namespace classic
 {
     class CaffeineBeverage // 咖啡机
     {
     public:
-        CaffeineBeverage(Recipe &Recipe)
-            : m_Recipe(Recipe)
+        CaffeineBeverage(Recipe &recipe)
+            : m_recipe(recipe), m_condiments(0)
         {
         }
 
         virtual ~CaffeineBeverage()
         {
+            m_condiments = 0;
         }
 
         void prepareRecipe() // 制作过程
         {
             boilWater();
-            m_Recipe.brew(); // 跟对象有关的动作
+            m_recipe.brew(); // 跟对象有关的动作
             pourInCup();
-            m_Recipe.addCondiments(); // 跟对象有关的动作
+            m_recipe.addCondiments(); // 跟对象有关的动作
+            if (m_condiments)
+                std::cout << m_condiments->description() << "\n";
+        }
+
+        void condiments(Condiment *condiments)
+        {
+            m_condiments = condiments;
         }
 
     private:
@@ -37,7 +47,8 @@ namespace classic
             std::cout << "pour in cup\n";
         }
 
-        Recipe &m_Recipe;
+        Recipe &m_recipe;
+        Condiment *m_condiments;
 
         NO_COPY(CaffeineBeverage);
     };
