@@ -2,420 +2,129 @@
 // 想法是用可以将std::function作为参数的函数参数替换抽象类。然后std::function从外部控制多态的灵活性。这样，就可以大大简化许多GoF模式。
 
 // g++ -std=c++11 -o patterns_cpp11 patterns_cpp11.cpp
+#include "cpp11/CaffeineBeverage.h"
+#include "cpp11/Recipes.h"
+#include "cpp11/CoffeeMachine.h"
+#include "cpp11/View.h"
+#include "cpp11/MilkFoam.h"
+#include "cpp11/accu.h"
+#include "cpp11/Milk.h"
+#include "cpp11/Sugar.h"
+#include "cpp11/BeverageFactory.h"
+
 #include <iostream>
 #include <functional>
 #include <vector>
 #include <algorithm>
 #include <string>
-#include <boost/signals2.hpp>
-#include <boost/functional/factory.hpp>
 #include <memory>
 #include <map>
-
-#define NO_COPY(className)        \
-private:                          \
-    className(className const &); \
-                                  \
-private:                          \
-    className &operator=(className const &)
-
-#define NO_MOVE(className)   \
-private:                     \
-    className(className &&); \
-                             \
-private:                     \
-    className &&operator=(className &&)
-
-#define NO_COPY_NO_MOVE(className) \
-    NO_COPY(className);            \
-    NO_MOVE(className)
-
-using namespace std;
-
-namespace cpp11
-{
-
-    namespace beverages
-    {
-
-        struct Receipe
-        {
-        public:
-            function<void()> brew;
-            function<void()> addCondiments;
-        };
-
-        class CaffeineBeverage
-        {
-        public:
-            //  构造函数1
-            CaffeineBeverage(Receipe receipe)
-                : m_brew(receipe.brew), m_addCondiments(receipe.addCondiments)
-            {
-            }
-
-            // 构造函数2
-            CaffeineBeverage(function<void()> brew, function<void()> addCondiments)
-                : m_brew(brew), m_addCondiments(addCondiments)
-            {
-            }
-
-            void prepareReceipe()
-            {
-                boilWater();
-                m_brew();
-                pourInCup();
-                m_addCondiments();
-            }
-
-        private:
-            void boilWater()
-            {
-                cout << "boil water\n";
-            }
-
-            void pourInCup()
-            {
-                cout << "pour in cup\n";
-            }
-
-            function<void()> m_brew;
-            function<void()> m_addCondiments;
-
-            NO_COPY_NO_MOVE(CaffeineBeverage);
-        };
-
-        class Receipes
-        {
-        public:
-            static void brewCoffee(int minutes)
-            {
-                cout << minutes << "min for dripping Coffee through filter\n";
-            }
-
-            static void brewTea(int minutes)
-            {
-                cout << minutes << "min for steeping Tea\n";
-            }
-
-            static void addSugarAndMilk()
-            {
-                cout << "Adding Sugar and Milk\n";
-            }
-
-            static void addLemon()
-            {
-                cout << "Adding Lemon\n";
-            }
-
-            NO_COPY_NO_MOVE(Receipes);
-        };
-
-        class CoffeeMachine
-        {
-        private:
-            typedef vector<function<void()>> CommandQ;
-
-        public:
-            CoffeeMachine()
-                : m_commands(), m_sigFinished()
-            {
-            }
-
-            void request(CommandQ::value_type c)
-            {
-                m_commands.push_back(c);
-            }
-
-            void start()
-            {
-                for_each(
-                    begin(m_commands), end(m_commands),
-                    [](CommandQ::value_type c)
-                    { c(); });
-                m_sigFinished();
-            }
-
-            void getNotifiedOnFinished(function<void()> callback)
-            {
-                m_sigFinished.connect(callback);
-            }
-
-        private:
-            CommandQ m_commands;
-            boost::signals2::signal<void()> m_sigFinished;
-
-            NO_COPY_NO_MOVE(CoffeeMachine);
-        };
-
-        class View
-        {
-        public:
-            View()
-            {
-            }
-
-            void coffeeMachineFinished()
-            {
-                cout << "Orders are ready to be served\n";
-            }
-
-        private:
-            NO_COPY_NO_MOVE(View);
-        };
-
-        class MilkFoam
-        {
-        public:
-            MilkFoam()
-            {
-            }
-
-            void makeFoam(int mlMilk)
-            {
-                boilMilk(mlMilk);
-                pourInCup();
-                foaming();
-            }
-
-        private:
-            void boilMilk(int mlMilk)
-            {
-                cout << "boiling " << mlMilk << "ml milk\n";
-            }
-
-            void pourInCup()
-            {
-                cout << "pour in cup\n";
-            }
-
-            void foaming()
-            {
-                cout << "foaming\n";
-            }
-
-            NO_COPY_NO_MOVE(MilkFoam);
-        };
-
-        struct Condiment
-        {
-            function<string()> description;
-            function<float()> price;
-        };
-
-        template <typename Res>
-        static Res accu(function<Res()> call, function<Res()> next)
-        {
-            if (next)
-                return call() + next();
-            return call();
-        }
-
-        class Milk
-        {
-        public:
-            static string description()
-            {
-                return "-Milk-";
-            }
-
-            static float price()
-            {
-                return 0.13f;
-            }
-        };
-
-        class Sugar
-        {
-        public:
-            static string description()
-            {
-                return "-Sugar-";
-            }
-
-            static float price()
-            {
-                return 0.07f;
-            }
-        };
-
-        class BeverageFactory
-        {
-        private:
-            typedef function<CaffeineBeverage *()> CreateFun;
-
-        public:
-            BeverageFactory()
-                : m_factory()
-            {
-                // lambdas method
-                // m_factory["Coffee"] =
-                //     bind(
-                //         boost::factory<CaffeineBeverage *>(),
-                //         []
-                //         { Receipes::brewCoffee(45); },
-                //         []
-                //         { Receipes::addSugarAndMilk(); });
-
-                // m_factory["Tea"] =
-                //     bind(
-                //         boost::factory<CaffeineBeverage *>(),
-                //         []
-                //         { Receipes::brewTea(37); },
-                //         []
-                //         { Receipes::addLemon(); });
-                m_factory["Coffee"] =
-                    bind(
-                        boost::factory<CaffeineBeverage *>(),
-                        bind(&Receipes::brewCoffee, 1),
-                        &Receipes::addSugarAndMilk);
-
-                m_factory["Tea"] =
-                    bind(
-                        boost::factory<CaffeineBeverage *>(),
-                        bind(&Receipes::brewTea, 1),
-                        &Receipes::addLemon);
-            }
-
-            // CaffeineBeverage *create(string const &beverage)
-            // {
-            //     return m_factory[beverage]();
-            // }
-            unique_ptr<CaffeineBeverage> create(string const &beverage)
-            {
-                return unique_ptr<CaffeineBeverage>(m_factory[beverage]());
-            }
-
-        private:
-            map<string, CreateFun> m_factory;
-
-            NO_COPY_NO_MOVE(BeverageFactory);
-        };
-
-    }
-
-}
 
 int main(int argc, char *argv[])
 {
 
+    using namespace cpp11;
     {
-        using namespace cpp11;
+
+        CaffeineBeverage coffee(std::bind(&Recipes::brewCoffee, 1), &Recipes::addSugarAndMilk);
+
+        CaffeineBeverage tea(std::bind(&Recipes::brewTea, 2), &Recipes::addLemon);
+
+        typedef std::vector<CaffeineBeverage *> Beverages;
+        Beverages beverages;
+
+        beverages.push_back(&coffee);
+        beverages.push_back(&tea);
+
+        // for_each(
+        //     begin(beverages), end(beverages),
+        //     bind(&CaffeineBeverage::prepareRecipe, placeholders::_1));
+
+        for (auto beverage : beverages)
         {
-            using namespace beverages;
-
-            CaffeineBeverage coffee(bind(&Receipes::brewCoffee, 1), &Receipes::addSugarAndMilk);
-
-            CaffeineBeverage tea(bind(&Receipes::brewTea, 2), &Receipes::addLemon);
-
-            typedef vector<CaffeineBeverage *> Beverages;
-            Beverages beverages;
-
-            beverages.push_back(&coffee);
-            beverages.push_back(&tea);
-
-            // for_each(
-            //     begin(beverages), end(beverages),
-            //     bind(&CaffeineBeverage::prepareReceipe, placeholders::_1));
-
-            for (auto beverage : beverages)
-            {
-                beverage->prepareReceipe();
-            }
-
-            // result:
-            // boil water
-            // 1min for dripping Coffee through filter
-            // pour in cup
-            // Adding Sugar and Milk
-            // boil water
-            // 2min for steeping Tea
-            // pour in cup
-            // Adding Lemon
-
-            CoffeeMachine coffeeMachine;
-
-            View view;
-            // coffeeMachine.getNotifiedOnFinished(bind(&View::coffeeMachineFinished, &view));
-            coffeeMachine.getNotifiedOnFinished([&]
-                                                { view.coffeeMachineFinished(); });
-
-            coffeeMachine.request(bind(&CaffeineBeverage::prepareReceipe, &coffee));
-            coffeeMachine.request(bind(&CaffeineBeverage::prepareReceipe, &tea));
-
-            MilkFoam milkFoam;
-            coffeeMachine.request(bind(&MilkFoam::makeFoam, &milkFoam, 100));
-
-            coffeeMachine.start();
-            // result:
-            // boil water
-            // 1min for dripping Coffee through filter
-            // pour in cup
-            // Adding Sugar and Milk
-            // boil water
-            // 2min for steeping Tea
-            // pour in cup
-            // Adding Lemon
-            // boiling 100ml milk
-            // pour in cup
-            // foaming
-            //Orders are ready to be served
-
-            coffeeMachine.request(bind(&MilkFoam::makeFoam, &milkFoam, 200));
-            coffeeMachine.request(bind(&MilkFoam::makeFoam, &milkFoam, 300));
-            coffeeMachine.start();
-            // results:
-            // boil water
-            // 1min for dripping Coffee through filter
-            // pour in cup
-            // Adding Sugar and Milk
-            // boil water
-            // 2min for steeping Tea
-            // pour in cup
-            // Adding Lemon
-            // boiling 100ml milk
-            // pour in cup
-            // foaming
-            // boiling 200ml milk
-            // pour in cup
-            // foaming
-            // boiling 300ml milk
-            // pour in cup
-            // foaming
-            //Orders are ready to be served
-
-            Condiment condiments;
-            // condiments.description = bind(&accu<string>, &Milk::description, condiments.description);
-            // condiments.description = bind(&accu<string>, &Sugar::description, condiments.description);
-            // condiments.description = bind(&accu<string>, &Sugar::description, condiments.description);
-            condiments.description = [=]
-            { return accu<string>(&Milk::description, condiments.description); };
-            condiments.description = [=]
-            { return accu<string>(&Sugar::description, condiments.description); };
-            condiments.description = [=]
-            { return accu<string>(&Sugar::description, condiments.description); };
-
-            function<float()> condimentPrice;
-            // condiments.price = bind(&accu<float>, &Milk::price, condimentPrice);
-            // condiments.price = bind(&accu<float>, &Sugar::price, condimentPrice);
-            // condiments.price = bind(&accu<float>, &Sugar::price, condimentPrice);
-            condiments.price = [=]
-            { return accu<float>(&Milk::price, condimentPrice); };
-            condiments.price = [=]
-            { return accu<float>(&Milk::price, condimentPrice); };
-            condiments.price = [=]
-            { return accu<float>(&Milk::price, condimentPrice); };
-
-            cout << "Condiments: " << condiments.description() << '\n';
-            cout << "Price: " << condiments.price() << '\n';
-            // results:
-            // Condiments : -Sugar-- Sugar-- Milk -
-            // Price : 0.07
-
-            BeverageFactory factory;
-            factory.create("Coffee")->prepareReceipe();
-            factory.create("Tea")->prepareReceipe();
+            beverage->prepareRecipe();
         }
+
+        // result:
+        // boil water
+        // 1min for dripping Coffee through filter
+        // pour in cup
+        // Adding Sugar and Milk
+        // boil water
+        // 2min for steeping Tea
+        // pour in cup
+        // Adding Lemon
+
+        CoffeeMachine coffeeMachine;
+
+        View view;
+        // coffeeMachine.getNotifiedOnFinished(bind(&View::coffeeMachineFinished, &view));
+        coffeeMachine.getNotifiedOnFinished([&]
+                                            { view.coffeeMachineFinished(); });
+
+        coffeeMachine.request(std::bind(&CaffeineBeverage::prepareRecipe, &coffee));
+        coffeeMachine.request(std::bind(&CaffeineBeverage::prepareRecipe, &tea));
+
+        MilkFoam milkFoam;
+        coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 100));
+
+        coffeeMachine.start();
+        // result:
+        // boil water
+        // 1min for dripping Coffee through filter
+        // pour in cup
+        // Adding Sugar and Milk
+        // boil water
+        // 2min for steeping Tea
+        // pour in cup
+        // Adding Lemon
+        // boiling 100ml milk
+        // pour in cup
+        // foaming
+        //Orders are ready to be served
+
+        coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 200));
+        coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 300));
+        coffeeMachine.start();
+        // results:
+        // boil water
+        // 1min for dripping Coffee through filter
+        // pour in cup
+        // Adding Sugar and Milk
+        // boil water
+        // 2min for steeping Tea
+        // pour in cup
+        // Adding Lemon
+        // boiling 100ml milk
+        // pour in cup
+        // foaming
+        // boiling 200ml milk
+        // pour in cup
+        // foaming
+        // boiling 300ml milk
+        // pour in cup
+        // foaming
+        //Orders are ready to be served
+
+        std::function<std::string()> condimentDescription;
+        condimentDescription = bind(&accu<std::string>, &Milk::description, condimentDescription);
+        condimentDescription = bind(&accu<std::string>, &Sugar::description, condimentDescription);
+        condimentDescription = bind(&accu<std::string>, &Sugar::description, condimentDescription);
+
+        std::function<float()> condimentPrice;
+        condimentPrice = bind(&accu<float>, &Milk::price, condimentPrice);
+        condimentPrice = bind(&accu<float>, &Sugar::price, condimentPrice);
+        condimentPrice = bind(&accu<float>, &Sugar::price, condimentPrice);
+
+        std::cout << "Condiments: " << condimentDescription() << '\n';
+        std::cout << "Price: " << condimentPrice() << '\n';
+        // results:
+        // Condiments : -Sugar-- Sugar-- Milk -
+        // Price : 0.07
+
+        BeverageFactory factory;
+        factory.create("Coffee")->prepareRecipe();
+        factory.create("Tea")->prepareRecipe();
     }
     return 0;
 }

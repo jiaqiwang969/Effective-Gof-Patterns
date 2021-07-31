@@ -2,7 +2,7 @@
 set namespaceSeparator ::
 
 class cpp11::beverages::CaffeineBeverage {
-+ void prepareReceipe()
++ void prepareRecipe()
 }
 
 class cpp11::beverages::CoffeeMachine {
@@ -12,10 +12,10 @@ class cpp11::beverages::CoffeeMachine {
 - boost::signals2::signal<void()> m_sigFinished;
 }
 
-class cpp11::beverages::Condiment {
-+ function<string()> description
-+ function<float()> price
-}
+' class cpp11::beverages::Condiment {
+' + function<string()> description
+' + function<float()> price
+' }
 
 class cpp11::beverages::Milk {
 + static string description()
@@ -32,12 +32,12 @@ class cpp11::beverages::MilkFoam {
 + void makeFoam(int mlMilk)
 }
 
-class cpp11::beverages::Receipe {
+class cpp11::beverages::Recipe {
 + function<void()> brew;
 + function<void()> addCondiments;
 }
 
-interface cpp11::beverages::Receipes {
+interface cpp11::beverages::Recipes {
 + void brewCoffee(int minutes)
 + void brewTea(int minutes)
 + void addSugarAndMilk()
@@ -58,21 +58,21 @@ class cpp11::beverages::BeverageFactory
 
 cpp11::beverages::BeverageFactory "create".right.> cpp11::beverages::CaffeineBeverage
 
-cpp11::beverages::BeverageFactory "bind".right.> cpp11::beverages::Receipes
+cpp11::beverages::BeverageFactory "bind".right.> cpp11::beverages::Recipes
 
-cpp11::beverages::CaffeineBeverage *-right-> cpp11::beverages::Receipe
+cpp11::beverages::CaffeineBeverage *-right-> cpp11::beverages::Recipe
 
 cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::CaffeineBeverage
 
-cpp11::beverages::CaffeineBeverage "bind"..> cpp11::beverages::Receipes
+cpp11::beverages::CaffeineBeverage "bind"..> cpp11::beverages::Recipes
 
 
 cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::MilkFoam
 
 cpp11::beverages::CoffeeMachine "bind"..> cpp11::beverages::View
 
-cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Milk
-cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Sugar
+' cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Milk
+' cpp11::beverages::Condiment "accu"..>  cpp11::beverages::Sugar
 
 
 @enduml
