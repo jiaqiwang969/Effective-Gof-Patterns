@@ -214,6 +214,10 @@ interface cpp11::Recipes {
 + void addLemon()
 }
 
+class cpp11::accu<typename Res> {
++ static Res accu(std::function<Res()> call, std::function<Res()> next)
+}
+
 
 class cpp11::View
 {
@@ -241,7 +245,7 @@ cpp11::CoffeeMachine "bind"..> cpp11::MilkFoam
 
 cpp11::CoffeeMachine "bind"..> cpp11::View
 
-' cpp11::Condiment "accu"..>  cpp11::Milk
-' cpp11::Condiment "accu"..>  cpp11::Sugar
+cpp11::accu "bind"..>  cpp11::Milk
+cpp11::accu "bind"..>  cpp11::Sugar
 
 @enduml
