@@ -1,0 +1,247 @@
+@startuml
+set namespaceSeparator ::
+
+
+class classic::CoffeeMachine {
++ void request(class classic::Command *c)
++ void start()
++ void setState(CoffeeMachineState *newState)
++ void execute(string const &cmd)
+}
+
+interface classic::Command {
++ void execute()
+}
+
+class classic::MakeMilkFoam {
++ void execute()
++ void setMlMilk(int mlMilk)
+}
+
+
+class classic::MilkFoam {
++ void makeFoam(int mlMilk)
+}
+
+
+class classic::MakeCaffeineDrink {
++ void execute()
+}
+
+
+class classic::CaffeineBeverage {
++ void prepareRecipe()
+}
+
+
+class classic::Condiment {
++ int description()
++ float price()
+}
+
+class classic::Milk {
+}
+
+class classic::Sugar {
+}
+
+interface classic::Recipe {
++ void brew()
++ void addCondiments()
+}
+
+class classic::CoffeeRecipe {
++ void brew()
++ void addCondiments()
+}
+
+class classic::TeaRecipe {
++ void brew()
++ void addCondiments()
+}
+
+class classic::CoffeeMachineState{
++ virtual void action(CoffeeMachine &coffeeMachine, string const &cmd)  
+}
+
+class classic::CoffeeMachineObserver{
++ virtual void finished() = 0
+}
+
+class classic::View
+{
++ virtual void finished()
+}
+
+class classic::ObservableCoffeeMachine
+{
++ void addObserver(Observers::value_type o)
++ void removeObserver(Observers::value_type o)
+# void notifyFinished()
+}
+
+namespace classic {
+note right of ObservableCoffeeMachine::notifyFinished
+                for (Observers::iterator it(m_observers.begin()); 
+                it != m_observers.end(); ++it)
+                {
+                    (*it)->finished();
+                }
+end note
+}
+
+class classic::Coffee
+{   
+}
+
+class classic::Tea
+{   
+}
+
+class classic::CaffeineBeverageFactory
+{
+    virtual CaffeineBeverage* create() = 0
+}
+
+class classic::CoffeeFactory
+{
+    virtual CaffeineBeverage* create()
+}
+
+class classic::TeaFactory
+{
+    virtual CaffeineBeverage* create()
+}
+
+
+class classic::BeverageFactory
+{
+
+}
+
+
+classic::CoffeeRecipe -up-|> classic::Recipe
+classic::MakeCaffeineDrink -up-|> classic::Command
+classic::Milk -up-|> classic::Condiment
+classic::Sugar -up-|> classic::Condiment
+classic::TeaRecipe -up-|> classic::Recipe
+
+
+
+classic::Command <-up-* classic::CoffeeMachine   
+
+
+classic::CaffeineBeverage *-right-> classic::Recipe
+
+classic::MakeCaffeineDrink *--> classic::CaffeineBeverage
+
+classic::MakeMilkFoam -up-|> classic::Command
+classic::MilkFoam <-up-* classic::MakeMilkFoam
+
+
+classic::CoffeeMachine -up-|> classic::ObservableCoffeeMachine
+classic::ObservableCoffeeMachine *-right-> classic::CoffeeMachineObserver
+classic::View -up-|> classic::CoffeeMachineObserver 
+classic::CoffeeMachine *--> classic::CoffeeMachineState
+
+classic::View "&view".left.> classic::CoffeeMachine
+
+classic::Coffee -up-|> classic::CaffeineBeverage
+
+classic::Tea -up-|> classic::CaffeineBeverage
+
+classic::CoffeeFactory -up-|> classic::CaffeineBeverageFactory
+
+classic::TeaFactory -up-|> classic::CaffeineBeverageFactory
+
+classic::CoffeeFactory .right.> classic::Coffee
+
+classic::TeaFactory .right.> classic::Tea
+
+classic::CaffeineBeverageFactory .right.> classic::CaffeineBeverage
+
+
+classic::BeverageFactory *-right-> classic::CaffeineBeverageFactory
+
+classic::BeverageFactory .right.> classic::CoffeeFactory
+
+classic::BeverageFactory .right.> classic::TeaFactory
+
+
+' --------分割线--------
+
+
+class cpp11::CaffeineBeverage {
++ void prepareRecipe()
+}
+
+class cpp11::CoffeeMachine {
++ void request(vector<function<void()>> ::value_type c)
++ void start()
++ void getNotifiedOnFinished(function<void()> callback)
+- boost::signals2::signal<void()> m_sigFinished;
+}
+
+' class cpp11::Condiment {
+' + function<string()> description
+' + function<float()> price
+' }
+
+class cpp11::Milk {
++ static string description()
++ static float price()
+}
+
+class cpp11::Sugar {
++ static string description()
++ static float price()
+}
+
+
+class cpp11::MilkFoam {
++ void makeFoam(int mlMilk)
+}
+
+class cpp11::Recipe {
++ function<void()> brew;
++ function<void()> addCondiments;
+}
+
+interface cpp11::Recipes {
++ void brewCoffee(int minutes)
++ void brewTea(int minutes)
++ void addSugarAndMilk()
++ void addLemon()
+}
+
+
+class cpp11::View
+{
++ void coffeeMachineFinished()
+}
+
+class cpp11::BeverageFactory
+{
++ unique_ptr<CaffeineBeverage> create(string const &beverage)
+
+}
+
+cpp11::BeverageFactory "create".right.> cpp11::CaffeineBeverage
+
+cpp11::BeverageFactory "bind".right.> cpp11::Recipes
+
+cpp11::CaffeineBeverage *-right-> cpp11::Recipe
+
+cpp11::CoffeeMachine "bind"..> cpp11::CaffeineBeverage
+
+cpp11::CaffeineBeverage "bind"..> cpp11::Recipes
+
+
+cpp11::CoffeeMachine "bind"..> cpp11::MilkFoam
+
+cpp11::CoffeeMachine "bind"..> cpp11::View
+
+' cpp11::Condiment "accu"..>  cpp11::Milk
+' cpp11::Condiment "accu"..>  cpp11::Sugar
+
+@enduml
