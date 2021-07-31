@@ -1,13 +1,16 @@
 
 // 想法是用可以将std::function作为参数的函数参数替换抽象类。然后std::function从外部控制多态的灵活性。这样，就可以大大简化许多GoF模式。
 
-// g++ -std=c++11 -o strategy_11 strategy_11.cpp
+// g++ -std=c++11 -o patterns_cpp11 patterns_cpp11.cpp
 #include <iostream>
 #include <functional>
 #include <vector>
 #include <algorithm>
 #include <string>
 #include <boost/signals2.hpp>
+#include <boost/functional/factory.hpp>
+#include <memory>
+#include <map>
 
 #define NO_COPY(className)        \
 private:                          \
@@ -236,7 +239,61 @@ namespace cpp11
             }
         };
 
+        class BeverageFactory
+        {
+        private:
+            typedef function<CaffeineBeverage *()> CreateFun;
+
+        public:
+            BeverageFactory()
+                : m_factory()
+            {
+                // lambdas method
+                // m_factory["Coffee"] =
+                //     bind(
+                //         boost::factory<CaffeineBeverage *>(),
+                //         []
+                //         { Receipes::brewCoffee(45); },
+                //         []
+                //         { Receipes::addSugarAndMilk(); });
+
+                // m_factory["Tea"] =
+                //     bind(
+                //         boost::factory<CaffeineBeverage *>(),
+                //         []
+                //         { Receipes::brewTea(37); },
+                //         []
+                //         { Receipes::addLemon(); });
+                m_factory["Coffee"] =
+                    bind(
+                        boost::factory<CaffeineBeverage *>(),
+                        bind(&Receipes::brewCoffee, 1),
+                        &Receipes::addSugarAndMilk);
+
+                m_factory["Tea"] =
+                    bind(
+                        boost::factory<CaffeineBeverage *>(),
+                        bind(&Receipes::brewTea, 1),
+                        &Receipes::addLemon);
+            }
+
+            // CaffeineBeverage *create(string const &beverage)
+            // {
+            //     return m_factory[beverage]();
+            // }
+            unique_ptr<CaffeineBeverage> create(string const &beverage)
+            {
+                return unique_ptr<CaffeineBeverage>(m_factory[beverage]());
+            }
+
+        private:
+            map<string, CreateFun> m_factory;
+
+            NO_COPY_NO_MOVE(BeverageFactory);
+        };
+
     }
+
 }
 
 int main(int argc, char *argv[])
@@ -354,6 +411,10 @@ int main(int argc, char *argv[])
             // results:
             // Condiments : -Sugar-- Sugar-- Milk -
             // Price : 0.07
+
+            BeverageFactory factory;
+            factory.create("Coffee")->prepareReceipe();
+            factory.create("Tea")->prepareReceipe();
         }
     }
     return 0;

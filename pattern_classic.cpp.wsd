@@ -29,16 +29,9 @@ class classic::beverages::MakeCaffeineDrink {
 }
 
 
-class classic::beverages::Caffeinebeverages {
+class classic::beverages::CaffeineBeverage {
 + void prepareReceipe()
 }
-
-
-interface classic::beverages::Receipe {
-+ void brew()
-+ void addCondiments()
-}
-
 
 
 class classic::beverages::Condiment {
@@ -50,6 +43,11 @@ class classic::beverages::Milk {
 }
 
 class classic::beverages::Sugar {
+}
+
+interface classic::beverages::Receipe {
++ void brew()
++ void addCondiments()
 }
 
 class classic::beverages::CoffeeReceipe {
@@ -94,13 +92,38 @@ end note
 }
 }
 
+class classic::beverages::Coffee
+{   
+}
+
+class classic::beverages::Tea
+{   
+}
+
+class classic::beverages::CaffeineBeverageFactory
+{
+    virtual CaffeineBeverage* create() = 0
+}
+
+class classic::beverages::CoffeeFactory
+{
+    virtual CaffeineBeverage* create()
+}
+
+class classic::beverages::TeaFactory
+{
+    virtual CaffeineBeverage* create()
+}
 
 
+class classic::beverages::BeverageFactory
+{
+
+}
 
 
 classic::beverages::CoffeeReceipe -up-|> classic::beverages::Receipe
 classic::beverages::MakeCaffeineDrink -up-|> classic::beverages::Command
-classic::beverages::MakeMilkFoam -up-|> classic::beverages::Command
 classic::beverages::Milk -up-|> classic::beverages::Condiment
 classic::beverages::Sugar -up-|> classic::beverages::Condiment
 classic::beverages::TeaReceipe -up-|> classic::beverages::Receipe
@@ -110,10 +133,11 @@ classic::beverages::TeaReceipe -up-|> classic::beverages::Receipe
 classic::beverages::Command <-up-* classic::beverages::CoffeeMachine   
 
 
-classic::beverages::Caffeinebeverages *-down-> classic::beverages::Receipe
+classic::beverages::CaffeineBeverage *-right-> classic::beverages::Receipe
 
-classic::beverages::MakeCaffeineDrink *--> classic::beverages::Caffeinebeverages
+classic::beverages::MakeCaffeineDrink *--> classic::beverages::CaffeineBeverage
 
+classic::beverages::MakeMilkFoam -up-|> classic::beverages::Command
 classic::beverages::MilkFoam <-up-* classic::beverages::MakeMilkFoam
 
 
@@ -123,5 +147,26 @@ classic::beverages::View -up-|> classic::beverages::CoffeeMachineObserver
 classic::beverages::CoffeeMachine *--> classic::beverages::CoffeeMachineState
 
 classic::beverages::View "&view".left.> classic::beverages::CoffeeMachine
+
+classic::beverages::Coffee -up-|> classic::beverages::CaffeineBeverage
+
+classic::beverages::Tea -up-|> classic::beverages::CaffeineBeverage
+
+classic::beverages::CoffeeFactory -up-|> classic::beverages::CaffeineBeverageFactory
+
+classic::beverages::TeaFactory -up-|> classic::beverages::CaffeineBeverageFactory
+
+classic::beverages::CoffeeFactory .right.> classic::beverages::Coffee
+
+classic::beverages::TeaFactory .right.> classic::beverages::Tea
+
+classic::beverages::CaffeineBeverageFactory .right.> classic::beverages::CaffeineBeverage
+
+
+classic::beverages::BeverageFactory *-right-> classic::beverages::CaffeineBeverageFactory
+
+classic::beverages::BeverageFactory .right.> classic::beverages::CoffeeFactory
+
+classic::beverages::BeverageFactory .right.> classic::beverages::TeaFactory
 
 @enduml

@@ -1,11 +1,12 @@
 //Original UML ---> https : //cdn.mathpix.com/snip/images/RB2SQ9jYlXyQAKT8eWtOSsPHqL_pKrZiR4sQPlYa4KY.original.fullsize.png
 
-// g++ -std=c++98 -o strategy strategy.cpp
+// g++ -std=c++98 -o pattern_classic pattern_classic.cpp
 #include <iostream>
 #include <functional>
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <map>
 
 #define NO_COPY(className)        \
 private:                          \
@@ -45,6 +46,10 @@ namespace classic
         public:
             CaffeineBeverage(Receipe &receipe)
                 : m_receipe(receipe)
+            {
+            }
+
+            virtual ~CaffeineBeverage()
             {
             }
 
@@ -401,6 +406,102 @@ namespace classic
 
             NO_COPY(MakeMilkFoam);
         };
+
+        class Coffee : public CaffeineBeverage
+        {
+        public:
+            Coffee()
+                : CaffeineBeverage(m_receipe), m_receipe(3)
+            {
+            }
+
+        private:
+            CoffeeReceipe m_receipe;
+            NO_COPY(Coffee);
+        };
+
+        class Tea : public CaffeineBeverage
+        {
+        public:
+            Tea()
+                : CaffeineBeverage(m_receipe), m_receipe(4)
+            {
+            }
+
+        private:
+            TeaReceipe m_receipe;
+            NO_COPY(Tea);
+        };
+
+        class CaffeineBeverageFactory
+        {
+        public:
+            virtual ~CaffeineBeverageFactory()
+            {
+            }
+
+            virtual CaffeineBeverage *create() = 0;
+        };
+
+        class CoffeeFactory : public CaffeineBeverageFactory
+        {
+        public:
+            CoffeeFactory()
+                : CaffeineBeverageFactory()
+            {
+            }
+
+            virtual CaffeineBeverage *create()
+            {
+                return new Coffee();
+            }
+
+        private:
+            NO_COPY(CoffeeFactory);
+        };
+
+        class TeaFactory : public CaffeineBeverageFactory
+        {
+        public:
+            TeaFactory()
+                : CaffeineBeverageFactory()
+            {
+            }
+
+            virtual CaffeineBeverage *create()
+            {
+                return new Tea();
+            }
+
+        private:
+            NO_COPY(TeaFactory);
+        };
+
+        class BeverageFactory
+        {
+        public:
+            BeverageFactory()
+                : m_factory()
+            {
+                m_factory["Coffee"] = new CoffeeFactory();
+                m_factory["Tea"] = new TeaFactory();
+            }
+
+            ~BeverageFactory()
+            {
+                delete m_factory["Coffee"];
+                delete m_factory["Tea"];
+            }
+            CaffeineBeverage *create(string const &beverage)
+            {
+                return m_factory[beverage]->create();
+            }
+
+        private:
+            map<string, CaffeineBeverageFactory *> m_factory;
+
+            NO_COPY(BeverageFactory);
+        };
     }
 
 }
@@ -515,6 +616,10 @@ int main(int argc, char *argv[])
 
             cout << "Condiments: " << doubleSugarMilk.description() << '\n';
             cout << "Price: " << doubleSugarMilk.price() << '\n';
+
+            BeverageFactory factory;
+            factory.create("Coffee")->prepareReceipe();
+            factory.create("Tea")->prepareReceipe();
         }
     }
 
