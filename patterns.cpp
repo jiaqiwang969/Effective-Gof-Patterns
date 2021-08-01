@@ -174,18 +174,18 @@ int main(int argc, char *argv[])
 
                 do //request
                 {
-                    std::cout << "Coffeemachine now ready for taking orders or q for quit!" << std::endl;
+
                     std::string inBeverage;
-                    std::getline(std::cin, inBeverage);
-                    if (inBeverage == "q")
+                    if (!view.askForBeverage(inBeverage))
                         break;
                     beverages.push_back(beverageFactory.create(inBeverage));
-                    std::cout << "Choose condiments or q for next beverage order:" << std::endl;
-                    std::string inCondiment;
+                    CondimentFactory condimentFactory;
+                    Condiment *condiments = 0;
+
                     do
                     {
-                        std::getline(std::cin, inCondiment);
-                        if (inCondiment == "q")
+                        std::string inCondiment;
+                        if (!view.askForCondiments(inCondiment))
                             break;
                         condiments = condimentFactory.create(inCondiment, condiments);
                     } while (true);
@@ -415,19 +415,16 @@ int main(int argc, char *argv[])
 
             do
             {
-                std::cout << "Coffeemachine now ready for taking orders or q for quit!" << std::endl;
                 std::string inBeverage;
-                std::getline(std::cin, inBeverage);
-                if (inBeverage == "q")
+                if (!view.askForBeverage(inBeverage))
                     break;
                 beverages.emplace_back(beverageFactory.create(inBeverage));
                 std::cout << "Choose condiments or q for next beverage order:" << std::endl;
-                std::string inCondiment;
 
                 do
                 {
-                    std::getline(std::cin, inCondiment);
-                    if (inCondiment == "q")
+                    std::string inCondiment;
+                    if (!view.askForCondiments(inCondiment))
                         break;
                     Condiment condiment = condimentFactory.create(inCondiment);
                     condiments.description = std::bind(&accu<std::string>, condiment.description, condiments.description);
