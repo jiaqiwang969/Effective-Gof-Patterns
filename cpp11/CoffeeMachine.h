@@ -26,10 +26,13 @@ namespace cpp11
 
         void start()
         {
-            for_each(
-                begin(m_commands), end(m_commands),
-                [](CommandQ::value_type c)
-                { c(); });
+            for (auto const &cmd : m_commands)
+            {
+                cmd();
+            }
+            /*	for_each(
+		            begin(m_commands), end(m_commands),
+		            [](CommandQ::value_type c){ c(); });*/
             m_sigFinished();
         }
 
