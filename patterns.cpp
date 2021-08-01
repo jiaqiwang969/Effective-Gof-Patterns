@@ -140,18 +140,29 @@ int main(int argc, char *argv[])
             std::cout << "---------Chain--------" << '\n';
 
             // 独立的一个chain类
-            Milk milk;
-            Sugar sugarMilk(&milk);
-            Sugar doubleSugarMilk(&sugarMilk);
+            // Milk milk;
+            // Sugar sugarMilk(&milk);
+            // Sugar doubleSugarMilk(&sugarMilk);
+            Condiment *milk = new Milk();
+            Condiment *sugarMilk = new Sugar(milk);
+            Condiment *doubleSugarMilk = new Sugar(sugarMilk);
 
-            std::cout << "Condiments: " << doubleSugarMilk.description() << '\n';
-            std::cout << "Price: " << doubleSugarMilk.price() << '\n';
+            // std::cout << "Condiments: " << doubleSugarMilk.description() << '\n';
+            // std::cout << "Price: " << doubleSugarMilk.price() << '\n';
+            std::cout << "Condiments: " << doubleSugarMilk->description() << '\n';
+            std::cout << "Price: " << doubleSugarMilk->price() << '\n';
 
             std::cout << "---------Factory--------" << '\n';
 
             BeverageFactory factory;
-            factory.create("Coffee")->prepareRecipe();
-            factory.create("Tea")->prepareRecipe();
+            // factory.create("Coffee")->prepareRecipe();
+            // factory.create("Tea")->prepareRecipe();
+            CaffeineBeverage *b1 = factory.create("Coffee");
+            CaffeineBeverage *b2 = factory.create("Tea");
+            b1->prepareRecipe();
+            b2->prepareRecipe();
+            delete b1;
+            delete b2;
         }
     }
 

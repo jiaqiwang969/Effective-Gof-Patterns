@@ -18,7 +18,8 @@ namespace classic
 
         virtual ~CaffeineBeverage()
         {
-            m_condiments = 0;
+            if (m_condiments)
+                delete m_condiments;
         }
 
         void prepareRecipe() // 制作过程

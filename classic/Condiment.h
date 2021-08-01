@@ -21,6 +21,12 @@ namespace classic
         {
         }
 
+        virtual ~Condiment()
+        {
+            if (m_next)
+                delete m_next;
+        }
+
         std::string description()
         {
             if (m_next)
