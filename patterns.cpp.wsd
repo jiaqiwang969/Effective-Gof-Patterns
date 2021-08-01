@@ -30,7 +30,7 @@ class classic::MakeCaffeineDrink {
 
 
 class classic::CaffeineBeverage {
-+ void prepareRecipe()
++ void prepareRecipe() => 具体动作
 + void condiments(Condiment *condiments)
 - Recipe &m_recipe;
 - Condiment *m_condiments;
@@ -49,18 +49,20 @@ class classic::Sugar {
 }
 
 interface classic::Recipe {
-+ void brew()
-+ void addCondiments()
++ virtual int amountWaterMl()
++ virtual void brew()
 }
 
 class classic::CoffeeRecipe {
-+ void brew()
-+ void addCondiments()
++ virtual int amountWaterMl()
++ virtual void brew()
+- int m_amountWaterMl
 }
 
 class classic::TeaRecipe {
-+ void brew()
-+ void addCondiments()
++ virtual int amountWaterMl()
++ virtual void brew()
+- int m_amountWaterMl
 }
 
 class classic::CoffeeMachineState{
@@ -159,7 +161,7 @@ classic::TeaRecipe -up-|> classic::Recipe
 classic::Command "0..n"<-up-*"CommandQ" classic::CoffeeMachine   
 
 
-classic::CaffeineBeverage *-right-> classic::Recipe
+classic::CaffeineBeverage "策略"*-right-> classic::Recipe
 
 classic::MakeCaffeineDrink --> classic::CaffeineBeverage
 
@@ -222,8 +224,15 @@ classic::CaffeineBeverage *-right-> classic::Condiment
 
 
 class cpp11::CaffeineBeverage {
-+ void prepareRecipe() const
+# CaffeineBeverage(std::function<int()> amountWaterMl, std::function<void()> brew) 
++ void prepareRecipe() => 具体策略
++ void condiments(Condiment condiment)
 + string description() const
+- void boilWater(int amountWaterMl)
+- void pourInCup() const
+- void addCondiments() const
+- std::function<void()> m_brew;
+- std::function<int()> m_amountWaterMl;
 - string m_description;
 - Condiment m_condiment;
 }
@@ -262,10 +271,9 @@ class cpp11::MilkFoam {
 ' }
 
 class cpp11::Recipes {
-+ static void brewCoffee(int minutes)
-+ static void brewTea(int minutes)
-+ static void addSugarAndMilk()
-+ static void addLemon()
++ static void brewCoffee()
++ static void brewTea()
++ static int amountWaterMl(int ml)
 }
 
 class cpp11::accu<typename Res> {
@@ -287,7 +295,8 @@ class cpp11::CondimentFactory
 
 class cpp11::BeverageFactory
 {
-+ unique_ptr<CaffeineBeverage> create(std::string const &beverage)
++ BeverageFactory(): m_factory() => new CaffeineBeverage构造函数(boost::factory封装，bind绑定参数)
++ unique_ptr<CaffeineBeverage> create(std::string const &beverage) =>调用相应的CaffeineBeverage对象
 - map<std::string, CreateFun> m_factory;
 
 }
@@ -325,6 +334,9 @@ cpp11::accu "bind"..>  cpp11::Milk
 cpp11::accu "bind"..>  cpp11::Sugar
 
 cpp11::Recipes "bind"..>  cpp11::BeverageFactory
+
+cpp11::Recipes "function"..>  cpp11::CaffeineBeverage
+
 
 ' cpp11::CaffeineBeverage *--> cpp11::Recipes
 

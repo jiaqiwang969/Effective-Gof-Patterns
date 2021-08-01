@@ -38,6 +38,7 @@ namespace cpp11
             //         { Recipes::brewTea(37); },
             //         []
             //         { Recipes::addLemon(); });
+
             m_factory["Coffee"] =
                 std::bind(
                     boost::factory<CaffeineBeverage *>(),

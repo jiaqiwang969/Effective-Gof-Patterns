@@ -331,7 +331,8 @@ int main(int argc, char *argv[])
 
             std::cout << "---------4--------" << '\n';
 
-            BeverageFactory factory;
+            BeverageFactory factory; // 调用构造函数（boost）=> new CaffeineBeverage构造函数(boost::factory封装，bind绑定参数)
+
             factory.create("Coffee")->prepareRecipe(); // 默认加水3.1
             factory.create("Tea")->prepareRecipe();    // 默认加水4.1
         }
