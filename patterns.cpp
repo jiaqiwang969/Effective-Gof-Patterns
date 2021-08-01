@@ -152,64 +152,6 @@ int main(int argc, char *argv[])
             BeverageFactory factory;
             factory.create("Coffee")->prepareRecipe();
             factory.create("Tea")->prepareRecipe();
-
-            std::cout << "---------集合--------" << '\n';
-            {
-                CoffeeMachine coffeeMachine;
-                View view;
-                coffeeMachine.addObserver(&view);
-
-                MilkFoam milkFoam;
-                MakeMilkFoam makeMilkFoam(milkFoam, 101);
-
-                typedef std::vector<MakeCaffeineDrink *> MakeCaffeineDrinks;
-                MakeCaffeineDrinks makeCaffeineDrinks;
-
-                typedef std::vector<CaffeineBeverage *> Beverages;
-                Beverages beverages;
-
-                BeverageFactory beverageFactory;
-                CondimentFactory condimentFactory;
-                Condiment *condiments = 0;
-
-                do //request
-                {
-
-                    std::string inBeverage;
-                    if (!view.askForBeverage(inBeverage))
-                        break;
-                    beverages.push_back(beverageFactory.create(inBeverage));
-                    CondimentFactory condimentFactory;
-                    Condiment *condiments = 0;
-
-                    do
-                    {
-                        std::string inCondiment;
-                        if (!view.askForCondiments(inCondiment))
-                            break;
-                        condiments = condimentFactory.create(inCondiment, condiments);
-                    } while (true);
-                    beverages.back()->condiments(condiments);
-                } while (true);
-                if (!beverages.empty())
-                {
-                    for (Beverages::iterator it(beverages.begin()); it != beverages.end(); ++it)
-                    {
-                        makeCaffeineDrinks.push_back(new MakeCaffeineDrink(**it));
-                        coffeeMachine.request(makeCaffeineDrinks.back());
-                        coffeeMachine.request(&makeMilkFoam);
-                    }
-                    coffeeMachine.start();
-                    do
-                    {
-                        delete beverages.back();
-                        beverages.pop_back();
-                    } while (!beverages.empty());
-                }
-                else
-                {
-                }
-            }
         }
     }
 
@@ -397,54 +339,6 @@ int main(int argc, char *argv[])
 
             std::cout << "Condiments: " << condimentDescription() << '\n';
             std::cout << "Price: " << condimentPrice() << '\n';
-        }
-
-        {
-            std::cout << "---------cpp11-集合--------" << '\n';
-
-            CoffeeMachine coffeeMachine;
-            View view;
-            coffeeMachine.getNotifiedOnFinished(std::bind(&View::coffeeMachineFinished, &view));
-
-            typedef std::vector<std::unique_ptr<CaffeineBeverage>> Beverages;
-            Beverages beverages;
-
-            BeverageFactory beverageFactory;
-            CondimentFactory condimentFactory;
-            Condiment condiments;
-
-            do
-            {
-                std::string inBeverage;
-                if (!view.askForBeverage(inBeverage))
-                    break;
-                beverages.emplace_back(beverageFactory.create(inBeverage));
-                std::cout << "Choose condiments or q for next beverage order:" << std::endl;
-
-                do
-                {
-                    std::string inCondiment;
-                    if (!view.askForCondiments(inCondiment))
-                        break;
-                    Condiment condiment = condimentFactory.create(inCondiment);
-                    condiments.description = std::bind(&accu<std::string>, condiment.description, condiments.description);
-                    condiments.price = std::bind(&accu<float>, condiment.price, condiments.price);
-                } while (true);
-
-                beverages.back()->condiments(condiments);
-
-            } while (true);
-            if (!beverages.empty())
-            {
-                for (auto &beverage : beverages)
-                {
-                    coffeeMachine.request(std::bind(&CaffeineBeverage::prepareRecipe, beverage.get()));
-                }
-                coffeeMachine.start();
-            }
-            else
-            {
-            }
         }
     }
     return 0;
