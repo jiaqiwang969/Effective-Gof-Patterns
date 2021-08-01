@@ -41,14 +41,14 @@ namespace cpp11
             m_factory["Coffee"] =
                 std::bind(
                     boost::factory<CaffeineBeverage *>(),
-                    std::function<void()>(std::bind(&Recipes::brewCoffee, 1)),
-                    &Recipes::addSugarAndMilk);
+                    std::function<int()>(std::bind(&Recipes::amountWaterMl, 4)), // 默认加水量
+                    &Recipes::brewCoffee);
 
             m_factory["Tea"] =
                 std::bind(
                     boost::factory<CaffeineBeverage *>(),
-                    std::function<void()>(std::bind(&Recipes::brewTea, 1)),
-                    &Recipes::addLemon);
+                    std::function<int()>(std::bind(&Recipes::amountWaterMl, 5)), // 默认加水量
+                    &Recipes::brewTea);
         }
 
         // CaffeineBeverage *create(string const &beverage)

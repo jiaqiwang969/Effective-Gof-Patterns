@@ -9,7 +9,7 @@ namespace classic
     {
     public:
         virtual void brew() = 0;          // 继承
-        virtual void addCondiments() = 0; // 继承
+        virtual int amountWaterMl() = 0; // 继承
     };
 
 }

@@ -23,10 +23,10 @@ namespace classic
 
         void prepareRecipe() // 制作过程
         {
-            boilWater();
+            boilWater(m_recipe.amountWaterMl());
             m_recipe.brew(); // 跟对象有关的动作
             pourInCup();
-            m_recipe.addCondiments(); // 跟对象有关的动作
+            //m_recipe.addCondiments(); // 跟对象有关的动作
             if (m_condiments)
                 std::cout << m_condiments->description() << "\n";
         }
@@ -37,9 +37,9 @@ namespace classic
         }
 
     private:
-        void boilWater()
+        void boilWater(int amountWaterMl)
         {
-            std::cout << "boil water\n";
+            std::cout << "boiling " << amountWaterMl << "ml water\n";
         }
 
         void pourInCup()

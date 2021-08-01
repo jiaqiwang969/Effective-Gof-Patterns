@@ -9,7 +9,7 @@ namespace classic
     {
     public:
         Tea()
-            : CaffeineBeverage(m_Recipe), m_Recipe(4)
+            : CaffeineBeverage(m_Recipe), m_Recipe(4) // 默认加水量
         {
         }
 

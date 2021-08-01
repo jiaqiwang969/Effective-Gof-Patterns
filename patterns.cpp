@@ -42,10 +42,11 @@ int main(int argc, char *argv[])
             // 你好👋，我要来一份手冲摩卡咖啡☕️。
             // 好的，开始手冲摩卡咖啡的制作流程。
 
+            std::cout << "---------0--------" << '\n';
             // 定时：咖啡粉通过过滤器过滤1分钟
-            CoffeeRecipe coffeeRecipe(1);
+            CoffeeRecipe coffeeRecipe(151);
             // 定时：茶包泡2分钟
-            TeaRecipe teaRecipe(2);
+            TeaRecipe teaRecipe(201);
 
             //  初始化：咖啡
             CaffeineBeverage coffee(coffeeRecipe);
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
             // pour in cup
             // Adding Lemon
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------1--------" << '\n';
 
             // 初始化：做的是咖啡-->CaffeineBeverage
             //  coffee在前面已经初始化-->CoffeeRecipe coffeeRecipe(1)
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
 
             // 重新写入新的值
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------2-------" << '\n';
 
             makeMilkFoam.setMlMilk(200);
             // request -->push_back 到执行队列
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
             // pour in cup
             // foaming
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------3--------" << '\n';
 
             // 独立的一个chain类
             Milk milk;
@@ -148,11 +149,13 @@ int main(int argc, char *argv[])
             std::cout << "Condiments: " << doubleSugarMilk.description() << '\n';
             std::cout << "Price: " << doubleSugarMilk.price() << '\n';
 
+            std::cout << "---------4--------" << '\n';
+
             BeverageFactory factory;
             factory.create("Coffee")->prepareRecipe();
             factory.create("Tea")->prepareRecipe();
 
-            std::cout << "---------分割线-测试--------" << '\n';
+            std::cout << "---------5--------" << '\n';
             {
                 CoffeeMachine coffeeMachine;
                 View view;
@@ -213,8 +216,6 @@ int main(int argc, char *argv[])
                 else
                 {
                 }
-
-                std::cout << "---------分割线--------" << '\n';
             }
         }
     }
@@ -224,9 +225,11 @@ int main(int argc, char *argv[])
         {
             std::cout << "---------cpp11--------" << '\n';
 
-            CaffeineBeverage coffee(std::bind(&Recipes::brewCoffee, 1), &Recipes::addSugarAndMilk);
+            std::cout << "---------0--------" << '\n';
 
-            CaffeineBeverage tea(std::bind(&Recipes::brewTea, 2), &Recipes::addLemon);
+            CaffeineBeverage coffee(std::bind(&Recipes::amountWaterMl, 150), &Recipes::brewCoffee);
+
+            CaffeineBeverage tea(std::bind(&Recipes::amountWaterMl, 200), &Recipes::brewTea);
 
             typedef std::vector<CaffeineBeverage *> Beverages;
             Beverages beverages;
@@ -253,7 +256,7 @@ int main(int argc, char *argv[])
             // pour in cup
             // Adding Lemon
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------1--------" << '\n';
 
             CoffeeMachine coffeeMachine;
 
@@ -283,7 +286,7 @@ int main(int argc, char *argv[])
             // foaming
             //Orders are ready to be served
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------2--------" << '\n';
 
             coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 200));
             coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 300));
@@ -308,7 +311,7 @@ int main(int argc, char *argv[])
             // foaming
             //Orders are ready to be served
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------3--------" << '\n';
 
             std::function<std::string()> condimentDescription;
             condimentDescription = std::bind(&accu<std::string>, &Milk::description, condimentDescription);
@@ -326,14 +329,14 @@ int main(int argc, char *argv[])
             // Condiments : -Sugar-- Sugar-- Milk -
             // Price : 0.07
 
-            std::cout << "---------分割线--------" << '\n';
+            std::cout << "---------4--------" << '\n';
 
             BeverageFactory factory;
-            factory.create("Coffee")->prepareRecipe();
-            factory.create("Tea")->prepareRecipe();
+            factory.create("Coffee")->prepareRecipe(); // 默认加水3.1
+            factory.create("Tea")->prepareRecipe();    // 默认加水4.1
         }
 
-        std::cout << "---------分割线-CPP11-condiment-test--------" << '\n';
+        std::cout << "---------5--------" << '\n';
 
         CoffeeMachine coffeeMachine;
         View view;
@@ -368,7 +371,7 @@ int main(int argc, char *argv[])
             } while (true);
 
             beverages.back()->condiments(condiments);
-            
+
         } while (true);
         if (!beverages.empty())
         {

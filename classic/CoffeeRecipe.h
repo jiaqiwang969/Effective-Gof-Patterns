@@ -10,23 +10,23 @@ namespace classic
     class CoffeeRecipe : public Recipe // 咖啡点单
     {
     public:
-        CoffeeRecipe(int minutes)
-            : Recipe(), m_minutes(minutes)
+        CoffeeRecipe(int amountWaterMl)
+            : Recipe(), m_amountWaterMl(amountWaterMl)
         {
         }
 
         virtual void brew() // 过滤过程
         {
-            std::cout << m_minutes << "min dripping Coffee through filter\n";
+            std::cout << "dripping Coffee through filter\n";
         }
 
-        virtual void addCondiments() // 加调味料
+        virtual int amountWaterMl() // 加水量
         {
-            std::cout << "Adding Sugar and Milk\n";
+            return m_amountWaterMl;
         }
 
     private:
-        int m_minutes;
+        int m_amountWaterMl;
 
         NO_COPY(CoffeeRecipe);
     };

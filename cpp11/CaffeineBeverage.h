@@ -20,17 +20,16 @@ namespace cpp11
         // }
 
         // 构造函数2
-        CaffeineBeverage(std::function<void()> brew, std::function<void()> addCondiments)
-            : m_brew(brew), m_addCondiments(addCondiments), m_description("CaffeineBeverage"), m_condiment()
+        CaffeineBeverage(std::function<int()> amountWaterMl, std::function<void()> brew)
+            : m_brew(brew), m_amountWaterMl(amountWaterMl), m_description("CaffeineBeverage"), m_condiment()
         {
         }
 
-        void prepareRecipe() const
+        void prepareRecipe()
         {
-            boilWater();
+            boilWater(m_amountWaterMl());
             m_brew();
             pourInCup();
-            m_addCondiments();
             addCondiments();
         }
 
@@ -46,9 +45,9 @@ namespace cpp11
         }
 
     private:
-        void boilWater() const
+        void boilWater(int amountWaterMl)
         {
-            std::cout << "boil water\n";
+            std::cout << "boiling " << amountWaterMl << "ml water\n";
         }
 
         void pourInCup() const
@@ -63,7 +62,7 @@ namespace cpp11
         }
 
         std::function<void()> m_brew;
-        std::function<void()> m_addCondiments;
+        std::function<int()> m_amountWaterMl;
         std::string m_description;
         Condiment m_condiment;
 
