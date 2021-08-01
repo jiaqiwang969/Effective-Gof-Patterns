@@ -22,34 +22,34 @@ namespace cpp11
         BeverageFactory()
             : m_factory()
         {
-            // lambdas method
+
             // m_factory["Coffee"] =
-            //     bind(
+            //     std::bind(
             //         boost::factory<CaffeineBeverage *>(),
-            //         []
-            //         { Recipes::brewCoffee(45); },
-            //         []
-            //         { Recipes::addSugarAndMilk(); });
+            //         std::function<int()>(std::bind(&Recipes::amountWaterMl, 3)),
+            //         &Recipes::brewCoffee);
 
             // m_factory["Tea"] =
-            //     bind(
+            //     std::bind(
             //         boost::factory<CaffeineBeverage *>(),
-            //         []
-            //         { Recipes::brewTea(37); },
-            //         []
-            //         { Recipes::addLemon(); });
+            //         std::function<int()>(std::bind(&Recipes::amountWaterMl, 4)),
+            //         &Recipes::brewTea);
 
-            m_factory["Coffee"] =
-                std::bind(
-                    boost::factory<CaffeineBeverage *>(),
-                    std::function<int()>(std::bind(&Recipes::amountWaterMl, 4)), // 默认加水量
-                    &Recipes::brewCoffee);
+            m_factory["Coffee"] = []
+            {
+                return new CaffeineBeverage(
+                    []
+                    { return 3; },
+                    &Recipes::brewCoffee, "Coffee", 2.48f);
+            };
 
-            m_factory["Tea"] =
-                std::bind(
-                    boost::factory<CaffeineBeverage *>(),
-                    std::function<int()>(std::bind(&Recipes::amountWaterMl, 5)), // 默认加水量
-                    &Recipes::brewTea);
+            m_factory["Tea"] = []
+            {
+                return new CaffeineBeverage(
+                    []
+                    { return 4; },
+                    &Recipes::brewTea, "Tea", 1.27f);
+            };
         }
 
         // CaffeineBeverage *create(string const &beverage)

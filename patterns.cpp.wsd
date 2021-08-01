@@ -15,6 +15,7 @@ interface classic::Command {
 
 class classic::MakeMilkFoam {
 + void execute()
++ void amountMl(int ml)
 }
 
 
@@ -31,8 +32,13 @@ class classic::MakeCaffeineDrink {
 class classic::CaffeineBeverage {
 + void prepareRecipe() => 具体动作
 + void condiments(Condiment *condiments)
++ void description()
++ void price()
 - Recipe &m_recipe;
 - Condiment *m_condiments;
+- std::string m_description;
+- float m_price;
+
 }
 
 
@@ -226,13 +232,15 @@ class cpp11::CaffeineBeverage {
 # CaffeineBeverage(std::function<int()> amountWaterMl, std::function<void()> brew) 
 + void prepareRecipe() => 具体策略
 + void condiments(Condiment condiment)
-+ string description() const
++ void description() const
++ void price() const
 - void boilWater(int amountWaterMl)
 - void pourInCup() const
 - void addCondiments() const
 - std::function<void()> m_brew;
 - std::function<int()> m_amountWaterMl;
 - string m_description;
+- float m_price;
 - Condiment m_condiment;
 }
 

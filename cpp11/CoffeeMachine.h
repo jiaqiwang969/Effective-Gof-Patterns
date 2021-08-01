@@ -43,7 +43,8 @@ namespace cpp11
 
     private:
         CommandQ m_commands;
-        boost::signals2::signal<void()> m_sigFinished;
+        //boost::signals2::signal<void()> m_sigFinished;
+        boost::signals2::signal_type<void(), boost::signals2::keywords::mutex_type<boost::signals2::dummy_mutex>>::type m_sigFinished;
 
         NO_COPY_NO_MOVE(CoffeeMachine);
     };
