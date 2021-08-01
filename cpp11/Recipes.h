@@ -21,7 +21,7 @@ namespace cpp11
 
         static void addSugarAndMilk()
         {
-            std::cout << "Adding Sugar and Milk\n";
+            std::cout << "Adding Sugar/Milk\n";
         }
 
         static void addLemon()

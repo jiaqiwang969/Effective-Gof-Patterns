@@ -53,16 +53,16 @@ int main(int argc, char *argv[])
             typedef std::vector<CaffeineBeverage *> Beverages;
             Beverages beverages;
 
-            // // 合并两条订单流程到一个清单
-            // beverages.push_back(&coffee);
-            // beverages.push_back(&tea);
+            // 合并两条订单流程到一个清单
+            beverages.push_back(&coffee);
+            beverages.push_back(&tea);
 
-            // // 然后利用多态机制，开始指定咖啡和茶的流程
-            // // 烧水->过滤->倒入杯中->加辅料
-            // for (Beverages::iterator it(beverages.begin()); it != beverages.end(); ++it)
-            // {
-            //     (*it)->prepareRecipe();
-            // }
+            // 然后利用多态机制，开始指定咖啡和茶的流程
+            // 烧水->过滤->倒入杯中->加辅料
+            for (Beverages::iterator it(beverages.begin()); it != beverages.end(); ++it)
+            {
+                (*it)->prepareRecipe();
+            }
 
             // 运行得到结果：
             // boil water
@@ -152,14 +152,24 @@ int main(int argc, char *argv[])
 
             std::cout << "---------分割线-测试--------" << '\n';
             {
-                typedef std::vector<CaffeineBeverage *> Beverages;
-                Beverages beverages;
                 CoffeeMachine coffeeMachine;
                 View view;
-                BeverageFactory beverageFactory;
-
                 coffeeMachine.addObserver(&view);
-                do
+
+                MilkFoam milkFoam;
+                MakeMilkFoam makeMilkFoam(milkFoam, 101);
+
+                typedef std::vector<MakeCaffeineDrink *> MakeCaffeineDrinks;
+                MakeCaffeineDrinks makeCaffeineDrinks;
+
+                typedef std::vector<CaffeineBeverage *> Beverages;
+                Beverages beverages;
+
+                BeverageFactory beverageFactory;
+                CondimentFactory condimentFactory;
+                Condiment *condiments = 0;
+
+                do //request
                 {
                     std::cout << "Coffeemachine now ready for taking orders or q for quit!" << std::endl;
                     std::string inBeverage;
@@ -169,8 +179,6 @@ int main(int argc, char *argv[])
                     beverages.push_back(beverageFactory.create(inBeverage));
                     std::cout << "Choose condiments or q for next beverage order:" << std::endl;
                     std::string inCondiment;
-                    CondimentFactory condimentFactory;
-                    Condiment *condiments = 0;
                     do
                     {
                         std::getline(std::cin, inCondiment);
@@ -182,12 +190,11 @@ int main(int argc, char *argv[])
                 } while (true);
                 if (!beverages.empty())
                 {
-                    typedef std::vector<MakeCaffeineDrink *> MakeCaffeineDrinks;
-                    MakeCaffeineDrinks makeCaffeineDrinks;
                     for (Beverages::iterator it(beverages.begin()); it != beverages.end(); ++it)
                     {
                         makeCaffeineDrinks.push_back(new MakeCaffeineDrink(**it));
                         coffeeMachine.request(makeCaffeineDrinks.back());
+                        coffeeMachine.request(&makeMilkFoam);
                     }
                     coffeeMachine.start();
                     do
