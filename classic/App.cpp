@@ -15,37 +15,23 @@
 
 int main(int argc, char *argv[])
 {
-    std::cout << "---------CoffeeMachine-App-classic--------" << '\n';
-
     using namespace classic;
-
-    CoffeeMachine coffeeMachine;
-    View view;
-    coffeeMachine.addObserver(&view);
-
-    MilkFoam milkFoam;
-    MakeMilkFoam makeMilkFoam(milkFoam, 101);
-
-    typedef std::vector<MakeCaffeineDrink *> MakeCaffeineDrinks;
-    MakeCaffeineDrinks makeCaffeineDrinks;
 
     typedef std::vector<CaffeineBeverage *> Beverages;
     Beverages beverages;
-
+    CoffeeMachine coffeeMachine;
+    View view;
     BeverageFactory beverageFactory;
-    CondimentFactory condimentFactory;
-    Condiment *condiments = 0;
 
-    do //request
+    coffeeMachine.addObserver(&view);
+    do
     {
-
         std::string inBeverage;
         if (!view.askForBeverage(inBeverage))
             break;
         beverages.push_back(beverageFactory.create(inBeverage));
         CondimentFactory condimentFactory;
         Condiment *condiments = 0;
-
         do
         {
             std::string inCondiment;
@@ -59,18 +45,17 @@ int main(int argc, char *argv[])
     {
         for (Beverages::iterator it(beverages.begin()); it != beverages.end(); ++it)
         {
-            makeCaffeineDrinks.push_back(new MakeCaffeineDrink(**it));
-            coffeeMachine.request(makeCaffeineDrinks.back());
-            coffeeMachine.request(&makeMilkFoam);
+            coffeeMachine.request(new MakeCaffeineDrink(**it));
         }
         coffeeMachine.start();
         do
         {
+            beverages.back()->description();
+            beverages.back()->price();
             delete beverages.back();
             beverages.pop_back();
         } while (!beverages.empty());
     }
-    else
-    {
-    }
+
+    return 0;
 }

@@ -12,9 +12,12 @@ namespace classic
     {
     public:
         CaffeineBeverage(Recipe &recipe)
-            : m_recipe(recipe), m_condiments(0)
+            : m_recipe(recipe), m_condiments(0), m_description("CaffeineBeverage"), m_price(0.0f)
         {
         }
+
+        CaffeineBeverage(Recipe &receipe, std::string description, float price)
+            : m_recipe(receipe), m_condiments(0), m_description(description), m_price(price) {}
 
         virtual ~CaffeineBeverage()
         {
@@ -37,6 +40,28 @@ namespace classic
             m_condiments = condiments;
         }
 
+        void description()
+        {
+            std::cout << m_description;
+            if (m_condiments)
+            {
+                std::cout << " : " << m_condiments->description();
+            }
+            std::cout << '\n';
+        }
+
+        void price()
+        {
+            if (m_condiments)
+            {
+                std::cout << m_price + m_condiments->price() << '\n';
+            }
+            else
+            {
+                std::cout << m_price << '\n';
+            }
+        }
+
     private:
         void boilWater(int amountWaterMl)
         {
@@ -50,6 +75,8 @@ namespace classic
 
         Recipe &m_recipe;
         Condiment *m_condiments;
+        std::string m_description;
+        float m_price;
 
         NO_COPY(CaffeineBeverage);
     };

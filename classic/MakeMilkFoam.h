@@ -19,6 +19,11 @@ namespace classic
             m_milk.makeFoam(m_mlMilk);
         }
 
+        void amountML(int ml)
+        {
+            m_mlMilk = ml;
+        }
+
     private:
         MilkFoam &m_milk;
         int m_mlMilk;
