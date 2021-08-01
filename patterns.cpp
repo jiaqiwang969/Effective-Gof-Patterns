@@ -97,9 +97,9 @@ int main(int argc, char *argv[])
             coffeeMachine.addObserver(&view);
 
             // 咖啡机写入清淡
-            coffeeMachine.request(&makeCoffee);
-            coffeeMachine.request(&makeTea);
-            coffeeMachine.request(&makeMilkFoam);
+            coffeeMachine.request(new MakeCaffeineDrink(coffee));
+            coffeeMachine.request(new MakeCaffeineDrink(tea));
+            coffeeMachine.request(new MakeMilkFoam(milkFoam, 100));
 
             // 启动 (*it)->execute();
             // 策略模式，按照给定的流程依次执行
@@ -119,13 +119,8 @@ int main(int argc, char *argv[])
 
             std::cout << "----------------" << '\n';
 
-            makeMilkFoam.setMlMilk(200);
-            // request -->push_back 到执行队列
-            coffeeMachine.request(&makeMilkFoam);
-            makeMilkFoam.setMlMilk(300);
-            // request -->push_back 到执行队列
-            coffeeMachine.request(&makeMilkFoam);
-            // 执行
+            coffeeMachine.request(new MakeMilkFoam(milkFoam, 200));
+            coffeeMachine.request(new MakeMilkFoam(milkFoam, 300));
             coffeeMachine.start();
 
             // boil water
@@ -210,11 +205,6 @@ int main(int argc, char *argv[])
                         delete beverages.back();
                         beverages.pop_back();
                     } while (!beverages.empty());
-                    do
-                    {
-                        delete makeCaffeineDrinks.back();
-                        makeCaffeineDrinks.pop_back();
-                    } while (!makeCaffeineDrinks.empty());
                 }
                 else
                 {

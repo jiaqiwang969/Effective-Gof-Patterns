@@ -15,7 +15,6 @@ interface classic::Command {
 
 class classic::MakeMilkFoam {
 + void execute()
-+ void setMlMilk(int mlMilk)
 }
 
 
@@ -133,7 +132,7 @@ class classic::CaffeineCondimentFactory
 
 class classic::CondimentFactory
 {
-+ Condiment *create(std::string const &beverage, Condiment *condiment)
++ Condiment *create(std::string const &condiment, Condiment *nextcondiment)
 - std::map<std::string, CaffeineCondimentFactory *> m_factory
 }
 
