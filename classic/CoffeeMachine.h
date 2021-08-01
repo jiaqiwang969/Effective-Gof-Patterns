@@ -11,7 +11,7 @@ namespace classic
     class CoffeeMachine : public ObservableCoffeeMachine
     {
     private:
-        typedef std::vector<Command *> CommandQ;
+        typedef std::vector<Command *> CommandQ; // command pattern
 
     public:
         CoffeeMachine()

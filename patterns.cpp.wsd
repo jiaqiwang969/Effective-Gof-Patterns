@@ -120,7 +120,7 @@ class classic::TeaFactory
 class classic::BeverageFactory
 {
 + CaffeineBeverage *create(std::string const &beverage)
-- CaffeineBeverageFactory *> m_factory
+- std::map<std::string, CaffeineBeverageFactory *> m_factory
 }
 
 
@@ -156,15 +156,15 @@ classic::TeaRecipe -up-|> classic::Recipe
 
 
 
-classic::Command <-up-* classic::CoffeeMachine   
+classic::Command "0..n"<-up-*"CommandQ" classic::CoffeeMachine   
 
 
 classic::CaffeineBeverage *-right-> classic::Recipe
 
-classic::MakeCaffeineDrink *--> classic::CaffeineBeverage
+classic::MakeCaffeineDrink --> classic::CaffeineBeverage
 
 classic::MakeMilkFoam -up-|> classic::Command
-classic::MilkFoam <-up-* classic::MakeMilkFoam
+classic::MilkFoam <-up- classic::MakeMilkFoam
 
 
 classic::CoffeeMachine -up-|> classic::ObservableCoffeeMachine
