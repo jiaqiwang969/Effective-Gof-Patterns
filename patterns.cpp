@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
             // foaming
             //Orders are ready to be served
 
-            std::cout << "---------Chain bind--------" << '\n';
+            std::cout << "-----------------" << '\n';
 
             coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 200));
             coffeeMachine.request(std::bind(&MilkFoam::makeFoam, &milkFoam, 300));
@@ -261,18 +261,17 @@ int main(int argc, char *argv[])
 
             std::cout << "---------Chain bind--------" << '\n';
 
-            std::function<std::string()> condimentDescription;
-            condimentDescription = std::bind(&accu<std::string>, &Milk::description, condimentDescription);
-            condimentDescription = std::bind(&accu<std::string>, &Sugar::description, condimentDescription);
-            condimentDescription = std::bind(&accu<std::string>, &Sugar::description, condimentDescription);
+            Condiment condiments;
+            condiments.description = std::bind(&accu<std::string>, &Milk::description, condiments.description);
+            condiments.description = std::bind(&accu<std::string>, &Sugar::description, condiments.description);
+            condiments.description = std::bind(&accu<std::string>, &Sugar::description, condiments.description);
 
-            std::function<float()> condimentPrice;
-            condimentPrice = std::bind(&accu<float>, &Milk::price, condimentPrice);
-            condimentPrice = std::bind(&accu<float>, &Sugar::price, condimentPrice);
-            condimentPrice = std::bind(&accu<float>, &Sugar::price, condimentPrice);
+            condiments.price = bind(&accu<float>, &Milk::price, condiments.price);
+            condiments.price = bind(&accu<float>, &Sugar::price, condiments.price);
+            condiments.price = bind(&accu<float>, &Sugar::price, condiments.price);
 
-            std::cout << "Condiments: " << condimentDescription() << '\n';
-            std::cout << "Price: " << condimentPrice() << '\n';
+            std::cout << "Condiments: " << condiments.description() << '\n';
+            std::cout << "Price: " << condiments.price() << '\n';
             // results:
             // Condiments : -Sugar-- Sugar-- Milk -
             // Price : 0.07
@@ -334,19 +333,19 @@ int main(int argc, char *argv[])
 
             std::function<std::string()> condimentDescription;
             condimentDescription = [=]
-            { return accu<std::string>(&Milk::description, condimentDescription); };
+            { return accu(&Milk::description, condimentDescription); };
             condimentDescription = [=]
-            { return accu<std::string>(&Sugar::description, condimentDescription); };
+            { return accu(&Sugar::description, condimentDescription); };
             condimentDescription = [=]
-            { return accu<std::string>(&Sugar::description, condimentDescription); };
+            { return accu(&Sugar::description, condimentDescription); };
 
             std::function<float()> condimentPrice;
             condimentPrice = [=]
-            { return accu<float>(&Milk::price, condimentPrice); };
+            { return accu(&Milk::price, condimentPrice); };
             condimentPrice = [=]
-            { return accu<float>(&Sugar::price, condimentPrice); };
+            { return accu(&Sugar::price, condimentPrice); };
             condimentPrice = [=]
-            { return accu<float>(&Sugar::price, condimentPrice); };
+            { return accu(&Sugar::price, condimentPrice); };
 
             std::cout << "Condiments: " << condimentDescription() << '\n';
             std::cout << "Price: " << condimentPrice() << '\n';
