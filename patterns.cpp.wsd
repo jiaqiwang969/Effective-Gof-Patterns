@@ -222,7 +222,10 @@ classic::CaffeineBeverage *-right-> classic::Condiment
 
 
 class cpp11::CaffeineBeverage {
-+ void prepareRecipe()
++ void prepareRecipe() const
++ string description() const
+- string m_description;
+- Condiment m_condiment;
 }
 
 class cpp11::CoffeeMachine {
@@ -232,10 +235,11 @@ class cpp11::CoffeeMachine {
 - boost::signals2::signal<void()> m_sigFinished;
 }
 
-' class cpp11::Condiment {
-' + function<string()> description
-' + function<float()> price
-' }
+
+class cpp11::Condiment {
++ function<string()> description
++ function<float()> price
+}
 
 class cpp11::Milk {
 + static string description()
@@ -252,16 +256,16 @@ class cpp11::MilkFoam {
 + void makeFoam(int mlMilk)
 }
 
-class cpp11::Recipe {
-+ function<void()> brew;
-+ function<void()> addCondiments;
-}
+' class cpp11::Recipe {
+' + function<void()> brew;
+' + function<void()> addCondiments;
+' }
 
-interface cpp11::Recipes {
-+ void brewCoffee(int minutes)
-+ void brewTea(int minutes)
-+ void addSugarAndMilk()
-+ void addLemon()
+class cpp11::Recipes {
++ static void brewCoffee(int minutes)
++ static void brewTea(int minutes)
++ static void addSugarAndMilk()
++ static void addLemon()
 }
 
 class cpp11::accu<typename Res> {
@@ -274,28 +278,54 @@ class cpp11::View
 + void coffeeMachineFinished()
 }
 
-class cpp11::BeverageFactory
+class cpp11::CondimentFactory
 {
-+ unique_ptr<CaffeineBeverage> create(string const &beverage)
++ Condiment create(std::string const &beverage)
+- map<std::string, CreateFun> m_factory
 
 }
 
-cpp11::BeverageFactory "create".right.> cpp11::CaffeineBeverage
+class cpp11::BeverageFactory
+{
++ unique_ptr<CaffeineBeverage> create(std::string const &beverage)
+- map<std::string, CreateFun> m_factory;
 
-cpp11::BeverageFactory "bind".right.> cpp11::Recipes
+}
 
-cpp11::CaffeineBeverage *-right-> cpp11::Recipe
+
+
+' cpp11::BeverageFactory "create"..> cpp11::CaffeineBeverage
+
+' cpp11::CondimentFactory "create"..> cpp11::CaffeineBeverage
+
+' cpp11::BeverageFactory "boost::factory"..> cpp11::Recipes
+
+' cpp11::CaffeineBeverage *-right-> cpp11::Recipe
 
 cpp11::CoffeeMachine "bind"..> cpp11::CaffeineBeverage
 
-cpp11::CaffeineBeverage "bind"..> cpp11::Recipes
+' cpp11::CaffeineBeverage "bind"..> cpp11::Recipes
 
 
 cpp11::CoffeeMachine "bind"..> cpp11::MilkFoam
 
-cpp11::CoffeeMachine "bind"..> cpp11::View
+cpp11::View "signal2".left.> cpp11::CoffeeMachine
+
+
+cpp11::CaffeineBeverage *-->  cpp11::Condiment
+cpp11::CondimentFactory "工厂".up.>  cpp11::Condiment
+
+cpp11::BeverageFactory "工厂".up.>  cpp11::CaffeineBeverage
+
+
+cpp11::Sugar .up.> cpp11::CondimentFactory
+cpp11::Milk .up.> cpp11::CondimentFactory
 
 cpp11::accu "bind"..>  cpp11::Milk
 cpp11::accu "bind"..>  cpp11::Sugar
+
+cpp11::Recipes "bind"..>  cpp11::BeverageFactory
+
+' cpp11::CaffeineBeverage *--> cpp11::Recipes
 
 @enduml
